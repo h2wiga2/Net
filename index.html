@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07090d">
+  <meta name="description" content="تست سرعت اینترنت، بررسی نشت DNS و WebRTC با رابط کاربری مدرن">
+  <title>NetGauge | تست سرعت و حریم خصوصی</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="topbar container">
+    <a class="brand" href="#" aria-label="نت گیج">
+      <span class="brand-mark"><i></i></span>
+      <span><strong>NET</strong>GAUGE</span>
+    </a>
+    <nav aria-label="ناوبری اصلی">
+      <a class="active" href="#speed">سرعت</a>
+      <a href="#privacy">حریم خصوصی</a>
+      <a href="#details">جزئیات</a>
+    </nav>
+    <div class="connection-pill" id="connectionPill">
+      <span></span><b>آنلاین</b>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero container" id="speed">
+      <div class="hero-copy">
+        <div class="eyebrow"><span></span> مرکز پایش شبکه</div>
+        <h1>قدرت واقعی<br><em>اتصال شما</em></h1>
+        <p>سرعت، پایداری و حریم خصوصی اینترنت خود را با یک تست دقیق و یکپارچه بررسی کنید.</p>
+        <div class="hero-meta">
+          <div><span>وضعیت</span><strong id="heroStatus">آماده تست</strong></div>
+          <div><span>موتور تست</span><strong>Cloudflare Edge</strong></div>
+        </div>
+      </div>
+
+      <div class="dashboard" aria-label="سرعت‌سنج اینترنت">
+        <div class="dashboard-glow"></div>
+        <div class="gauge-wrap">
+          <canvas id="gaugeCanvas" width="640" height="420" aria-label="نمایشگر سرعت"></canvas>
+          <div class="gauge-readout">
+            <span id="gaugeLabel">DOWNLOAD</span>
+            <strong id="gaugeValue">0.0</strong>
+            <small id="gaugeUnit">Mbps</small>
+          </div>
+        </div>
+
+        <div class="mini-metrics">
+          <div class="metric">
+            <span class="metric-icon latency-icon">↯</span>
+            <div><small>پینگ</small><strong id="pingValue">--</strong><i>ms</i></div>
+          </div>
+          <div class="metric">
+            <span class="metric-icon">⇣</span>
+            <div><small>دانلود</small><strong id="downloadValue">--</strong><i>Mbps</i></div>
+          </div>
+          <div class="metric">
+            <span class="metric-icon upload-icon">⇡</span>
+            <div><small>آپلود</small><strong id="uploadValue">--</strong><i>Mbps</i></div>
+          </div>
+        </div>
+
+        <button class="start-button" id="startTest" type="button">
+          <span class="button-ring"></span>
+          <span class="button-content"><b>شروع تست</b><small>START ENGINE</small></span>
+        </button>
+        <button class="stop-button" id="stopTest" type="button" hidden>توقف تست</button>
+        <p class="test-note" id="testNote" aria-live="polite">برای شروع، دکمه را فشار دهید</p>
+      </div>
+    </section>
+
+    <section class="stats-strip" id="details">
+      <div class="container stats-grid">
+        <article><span>01</span><div><small>JITTER</small><strong id="jitterValue">-- <i>ms</i></strong></div></article>
+        <article><span>02</span><div><small>NETWORK</small><strong id="networkType">نامشخص</strong></div></article>
+        <article><span>03</span><div><small>DATA USED</small><strong id="dataUsed">0 <i>MB</i></strong></div></article>
+        <article><span>04</span><div><small>SERVER</small><strong id="serverName">AUTO / EDGE</strong></div></article>
+      </div>
+    </section>
+
+    <section class="privacy-section container" id="privacy">
+      <div class="section-heading">
+        <div><span class="section-index">02 / SECURITY</span><h2>بازرسی حریم خصوصی</h2></div>
+        <p>ردپای عمومی اتصال خود را ببینید و نشت‌های احتمالی مرورگر و DNS را شناسایی کنید.</p>
+      </div>
+
+      <div class="privacy-grid">
+        <article class="security-card ip-card">
+          <div class="card-top">
+            <div class="card-icon">IP</div>
+            <span class="status-badge neutral" id="ipBadge">آماده بررسی</span>
+          </div>
+          <span class="card-kicker">PUBLIC IDENTITY</span>
+          <h3>آدرس IP عمومی</h3>
+          <strong class="ip-address" id="ipAddress">---.---.---.---</strong>
+          <dl>
+            <div><dt>موقعیت تقریبی</dt><dd id="ipLocation">—</dd></div>
+            <div><dt>ارائه‌دهنده</dt><dd id="ipProvider">—</dd></div>
+            <div><dt>نوع اتصال</dt><dd id="ipType">—</dd></div>
+          </dl>
+          <button class="card-button" id="checkIp" type="button">بررسی IP <span>←</span></button>
+        </article>
+
+        <article class="security-card dns-card">
+          <div class="card-top">
+            <div class="card-icon">DNS</div>
+            <span class="status-badge neutral" id="dnsBadge">تست نشده</span>
+          </div>
+          <span class="card-kicker">DNS RESOLVERS</span>
+          <h3>تست نشت DNS</h3>
+          <p class="card-description">بررسی می‌کند آیا DNS مشاهده‌شده با موقعیت و شبکه عمومی شما ناسازگار است.</p>
+          <div class="result-console" id="dnsResults">
+            <span class="console-empty">هنوز سروری شناسایی نشده است</span>
+          </div>
+          <button class="card-button accent" id="checkDns" type="button">اجرای تست DNS <span>←</span></button>
+        </article>
+
+        <article class="security-card webrtc-card">
+          <div class="card-top">
+            <div class="card-icon">RTC</div>
+            <span class="status-badge neutral" id="rtcBadge">تست نشده</span>
+          </div>
+          <span class="card-kicker">BROWSER LEAK</span>
+          <h3>نشت WebRTC</h3>
+          <p class="card-description">آدرس‌هایی را که مرورگر از طریق WebRTC در اختیار وب‌سایت‌ها قرار می‌دهد پیدا می‌کند.</p>
+          <div class="result-console" id="rtcResults">
+            <span class="console-empty">برای بررسی، تست را اجرا کنید</span>
+          </div>
+          <button class="card-button" id="checkRtc" type="button">بررسی WebRTC <span>←</span></button>
+        </article>
+      </div>
+      <div class="privacy-notice">
+        <span>!</span>
+        <p><strong>نکته حریم خصوصی:</strong> موقعیت IP تقریبی است. تشخیص قطعی نشت DNS از یک فایل HTML مستقل محدود است و نتیجه این ابزار باید در کنار تنظیمات VPN یا مرورگر بررسی شود.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <a class="brand footer-brand" href="#"><span class="brand-mark"><i></i></span><span><strong>NET</strong>GAUGE</span></a>
+      <p>داده‌های تست فقط برای نمایش نتیجه در مرورگر شما پردازش می‌شوند.</p>
+      <span>© 2026</span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
