@@ -23,6 +23,7 @@
     <nav aria-label="ناوبری اصلی">
       <a class="active" href="#speed">سرعت</a>
       <a href="#privacy">حریم خصوصی</a>
+      <a href="#host-lookup">جستجوی هاست</a>
       <a href="#details">جزئیات</a>
       <a href="#contact">تماس با ما</a>
     </nav>
@@ -144,6 +145,154 @@
         <p><strong>نکته حریم خصوصی:</strong> موقعیت IP تقریبی است. تشخیص قطعی نشت DNS از یک فایل HTML مستقل محدود است و نتیجه این ابزار باید در کنار تنظیمات VPN یا مرورگر بررسی شود.</p>
       </div>
     </section>
+
+    <section class="host-lookup-section container" id="host-lookup">
+      <div class="section-heading">
+        <div><span class="section-index">03 / HOST FINDER</span><h2>جستجوگر اطلاعات هاست</h2></div>
+        <p>کشور، آی‌پی و اطلاعات کامل هاست هر سایت را با یک جستجو کشف کنید.</p>
+      </div>
+
+      <div class="host-lookup-wrapper">
+        <div class="lookup-input-section">
+          <div class="input-container">
+            <div class="input-icon">🌐</div>
+            <input 
+              type="text" 
+              id="hostInput" 
+              class="host-input" 
+              placeholder="google.com, github.com, ..." 
+              dir="ltr"
+            />
+            <button class="lookup-button" id="lookupButton" type="button">
+              <span class="button-spinner"></span>
+              <span class="button-text">جستجو</span>
+            </button>
+          </div>
+          <p class="input-hint">آدرس وب‌سایت را بدون http:// وارد کنید</p>
+        </div>
+
+        <div class="lookup-loading" id="lookupLoading" hidden>
+          <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+          </div>
+          <p class="loading-text">در حال دریافت اطلاعات...</p>
+        </div>
+
+        <div class="lookup-results" id="lookupResults" hidden>
+          <div class="confetti-container" id="confettiContainer"></div>
+          <div class="result-header">
+            <div class="result-domain" id="resultDomain">example.com</div>
+            <div class="result-status" id="resultStatus">
+              <span class="status-dot"></span>
+              <span id="statusText">فعال</span>
+            </div>
+            <div class="ssl-badge" id="sslBadge" hidden>
+              <span>🔒</span>
+              <span>SSL</span>
+            </div>
+          </div>
+
+          <div class="result-cards">
+            <article class="result-card ip-info-card">
+              <div class="card-header">
+                <span class="card-icon">🌍</span>
+                <h4>موقعیت جغرافیایی</h4>
+              </div>
+              <div class="info-group">
+                <div class="info-item">
+                  <span class="info-label">کشور</span>
+                  <strong id="hostCountry" class="info-value">
+                    <span id="hostFlag" class="country-flag"></span>
+                    <span id="hostCountryName">—</span>
+                  </strong>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">شهر</span>
+                  <strong id="hostCity" class="info-value">—</strong>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">منطقه زمانی</span>
+                  <strong id="hostTimezone" class="info-value">—</strong>
+                </div>
+              </div>
+            </article>
+
+            <article class="result-card network-card">
+              <div class="card-header">
+                <span class="card-icon">🔗</span>
+                <h4>اطلاعات شبکه</h4>
+              </div>
+              <div class="info-group">
+                <div class="info-item">
+                  <span class="info-label">آدرس IP</span>
+                  <strong id="hostIp" class="info-value ip-value clickable" title="کلیک کنید تا کپی شود">
+                    <span class="ip-text">—</span>
+                    <span class="copy-icon">📋</span>
+                  </strong>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">ارائه‌دهنده</span>
+                  <strong id="hostIsp" class="info-value">—</strong>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">سازمان</span>
+                  <strong id="hostOrg" class="info-value">—</strong>
+                </div>
+              </div>
+            </article>
+
+            <article class="result-card details-card">
+              <div class="card-header">
+                <span class="card-icon">📊</span>
+                <h4>جزئیات بیشتر</h4>
+              </div>
+              <div class="info-group">
+                <div class="info-item">
+                  <span class="info-label">نوع IP</span>
+                  <span id="hostIpType" class="info-badge">—</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">کد کشور</span>
+                  <strong id="hostCountryCode" class="info-value">—</strong>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">موقعیت</span>
+                  <strong id="hostLatLng" class="info-value location-value">—</strong>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="result-footer">
+            <div class="result-stats">
+              <span>⚡</span>
+              <span>زمان پاسخگویی:</span>
+              <strong id="responseTime">--</strong>
+              <span>ms</span>
+            </div>
+            <div class="footer-buttons">
+              <button class="share-button" id="shareButton" type="button">
+                <span>🔗</span>
+                اشتراک‌گذاری
+              </button>
+              <button class="new-search-button" id="newSearchButton" type="button">
+                جستجوی جدید
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="lookup-error" id="lookupError" hidden>
+          <div class="error-icon">⚠️</div>
+          <h3>خطا در دریافت اطلاعات</h3>
+          <p id="errorMessage">لطفاً آدرس وارد شده را بررسی کنید و دوباره تلاش کنید.</p>
+          <button class="retry-button" id="retryButton" type="button">تلاش مجدد</button>
+        </div>
+      </div>
+    </section>
+
     <section class="contact-section" id="contact">
       <div class="container contact-box">
         <div class="contact-developer">
