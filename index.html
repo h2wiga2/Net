@@ -1,327 +1,342 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#07090d">
-  <meta name="description" content="WigaNet؛ تست سرعت اینترنت، بررسی نشت DNS و WebRTC با رابط کاربری مدرن">
-  <meta name="author" content="Hamed Abdollahi (Wiga) | حامد عبدالهی (ویگا)">
-  <title>WigaNet | تست سرعت و حریم خصوصی</title>
-  <link rel="icon" type="image/png" href="logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WigaNet — ابزار شبکه فارسی</title>
+  <meta name="description" content="تست سرعت اینترنت، بررسی حریم خصوصی و جستجوی اطلاعات هاست — ساخته حامد عبدالهی (ویگا)" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div>
-  <header class="topbar container">
-    <a class="brand" href="#" aria-label="ویگا نت">
-      <img class="brand-logo" src="logo.png" alt="لوگوی WigaNet" width="42" height="42">
-      <span><strong>WIGA</strong>NET</span>
-    </a>
-    <nav aria-label="ناوبری اصلی">
-      <a class="active" href="#speed">سرعت</a>
-      <a href="#privacy">حریم خصوصی</a>
-      <a href="#host-lookup">جستجوی هاست</a>
-      <a href="#details">جزئیات</a>
-      <a href="#contact">تماس با ما</a>
-    </nav>
-    <div class="connection-pill" id="connectionPill">
-      <span></span><b>آنلاین</b>
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="#">
+        <img src="logo.png" alt="WigaNet" class="brand-logo" width="36" height="36" onerror="this.style.display='none'" />
+        <span class="brand-name">WigaNet</span>
+      </a>
+
+      <nav aria-label="ناوبری اصلی">
+        <a class="active" href="#speed">سرعت</a>
+        <a href="#privacy">حریم خصوصی</a>
+        <a href="#host-lookup">جستجوی هاست</a>
+        <a href="#details">جزئیات</a>
+        <a href="#contact">تماس با ما</a>
+      </nav>
+
+      <div class="connection-pill" id="connectionPill">
+        <span class="conn-dot"></span>
+        <span class="conn-text" id="connText">در حال بررسی...</span>
+      </div>
     </div>
   </header>
 
-  <main>
-    <section class="hero container" id="speed">
-      <div class="hero-copy">
-        <div class="eyebrow"><span></span> مرکز پایش شبکه</div>
-        <h1>قدرت واقعی<br><em>اتصال شما</em></h1>
-        <p>سرعت، پایداری و حریم خصوصی اینترنت خود را با یک تست دقیق و یکپارچه بررسی کنید.</p>
-        <div class="hero-meta">
-          <div><span>وضعیت</span><strong id="heroStatus">آماده تست</strong></div>
-          <div><span>موتور تست</span><strong>Cloudflare Edge</strong></div>
-          <div><span>طراح و توسعه‌دهنده</span><strong>حامد عبدالهی (ویگا)</strong></div>
-        </div>
-      </div>
+  <!-- ═══ HERO / SPEED TEST ═══ -->
+  <section class="hero" id="speed">
+    <div class="container hero-inner">
 
-      <div class="dashboard" aria-label="سرعت‌سنج اینترنت">
-        <div class="dashboard-glow"></div>
-        <div class="gauge-wrap">
-          <canvas id="gaugeCanvas" width="640" height="420" aria-label="نمایشگر سرعت"></canvas>
-          <div class="gauge-readout">
-            <span id="gaugeLabel">DOWNLOAD</span>
-            <strong id="gaugeValue">0.0</strong>
-            <small id="gaugeUnit">Mbps</small>
-          </div>
-        </div>
+      <div class="hero-copy">
+        <span class="eyebrow">آنلاین · ابزار شبکه</span>
+        <h1>سرعت اینترنت<br /><em>خود را بسنجید</em></h1>
+        <p class="hero-meta">بدون نصب نرم‌افزار، سرعت دانلود، آپلود و پینگ اتصال خود را در لحظه اندازه‌گیری کنید.</p>
 
         <div class="mini-metrics">
           <div class="metric">
-            <span class="metric-icon latency-icon">↯</span>
-            <div><small>پینگ</small><strong id="pingValue">--</strong><i>ms</i></div>
+            <span class="metric-icon">📡</span>
+            <div class="metric-numbers">
+              <span class="metric-val" id="pingVal">—</span>
+              <span class="metric-unit">ms</span>
+            </div>
+            <span class="metric-label">پینگ</span>
           </div>
+          <span class="metric-sep"></span>
           <div class="metric">
-            <span class="metric-icon">⇣</span>
-            <div><small>دانلود</small><strong id="downloadValue">--</strong><i>Mbps</i></div>
+            <span class="metric-icon">⬇</span>
+            <div class="metric-numbers">
+              <span class="metric-val" id="dlVal">—</span>
+              <span class="metric-unit">Mbps</span>
+            </div>
+            <span class="metric-label">دانلود</span>
           </div>
+          <span class="metric-sep"></span>
           <div class="metric">
-            <span class="metric-icon upload-icon">⇡</span>
-            <div><small>آپلود</small><strong id="uploadValue">--</strong><i>Mbps</i></div>
-          </div>
-        </div>
-
-        <button class="start-button" id="startTest" type="button">
-          <span class="button-ring"></span>
-          <span class="button-content"><b>شروع تست</b><small>START ENGINE</small></span>
-        </button>
-        <button class="stop-button" id="stopTest" type="button" hidden>توقف تست</button>
-        <p class="test-note" id="testNote" aria-live="polite">برای شروع، دکمه را فشار دهید</p>
-      </div>
-    </section>
-
-    <section class="stats-strip" id="details">
-      <div class="container stats-grid">
-        <article><span>01</span><div><small>JITTER</small><strong id="jitterValue">-- <i>ms</i></strong></div></article>
-        <article><span>02</span><div><small>NETWORK</small><strong id="networkType">نامشخص</strong></div></article>
-        <article><span>03</span><div><small>DATA USED</small><strong id="dataUsed">0 <i>MB</i></strong></div></article>
-        <article><span>04</span><div><small>SERVER</small><strong id="serverName">AUTO / EDGE</strong></div></article>
-      </div>
-    </section>
-
-    <section class="privacy-section container" id="privacy">
-      <div class="section-heading">
-        <div><span class="section-index">02 / SECURITY</span><h2>بازرسی حریم خصوصی</h2></div>
-        <p>ردپای عمومی اتصال خود را ببینید و نشت‌های احتمالی مرورگر و DNS را شناسایی کنید.</p>
-      </div>
-
-      <div class="privacy-grid">
-        <article class="security-card ip-card">
-          <div class="card-top">
-            <div class="card-icon">IP</div>
-            <span class="status-badge neutral" id="ipBadge">آماده بررسی</span>
-          </div>
-          <span class="card-kicker">PUBLIC IDENTITY</span>
-          <h3>آدرس IP عمومی</h3>
-          <strong class="ip-address" id="ipAddress">---.---.---.---</strong>
-          <dl>
-            <div><dt>موقعیت تقریبی</dt><dd id="ipLocation">—</dd></div>
-            <div><dt>ارائه‌دهنده</dt><dd id="ipProvider">—</dd></div>
-            <div><dt>نوع اتصال</dt><dd id="ipType">—</dd></div>
-          </dl>
-          <button class="card-button" id="checkIp" type="button">بررسی IP <span>←</span></button>
-        </article>
-
-        <article class="security-card dns-card">
-          <div class="card-top">
-            <div class="card-icon">DNS</div>
-            <span class="status-badge neutral" id="dnsBadge">تست نشده</span>
-          </div>
-          <span class="card-kicker">DNS RESOLVERS</span>
-          <h3>تست نشت DNS</h3>
-          <p class="card-description">بررسی می‌کند آیا DNS مشاهده‌شده با موقعیت و شبکه عمومی شما ناسازگار است.</p>
-          <div class="result-console" id="dnsResults">
-            <span class="console-empty">هنوز سروری شناسایی نشده است</span>
-          </div>
-          <button class="card-button accent" id="checkDns" type="button">اجرای تست DNS <span>←</span></button>
-        </article>
-
-        <article class="security-card webrtc-card">
-          <div class="card-top">
-            <div class="card-icon">RTC</div>
-            <span class="status-badge neutral" id="rtcBadge">تست نشده</span>
-          </div>
-          <span class="card-kicker">BROWSER LEAK</span>
-          <h3>نشت WebRTC</h3>
-          <p class="card-description">آدرس‌هایی را که مرورگر از طریق WebRTC در اختیار وب‌سایت‌ها قرار می‌دهد پیدا می‌کند.</p>
-          <div class="result-console" id="rtcResults">
-            <span class="console-empty">برای بررسی، تست را اجرا کنید</span>
-          </div>
-          <button class="card-button" id="checkRtc" type="button">بررسی WebRTC <span>←</span></button>
-        </article>
-      </div>
-      <div class="privacy-notice">
-        <span>!</span>
-        <p><strong>نکته حریم خصوصی:</strong> موقعیت IP تقریبی است. تشخیص قطعی نشت DNS از یک فایل HTML مستقل محدود است و نتیجه این ابزار باید در کنار تنظیمات VPN یا مرورگر بررسی شود.</p>
-      </div>
-    </section>
-
-    <section class="host-lookup-section container" id="host-lookup">
-      <div class="section-heading">
-        <div><span class="section-index">03 / HOST FINDER</span><h2>جستجوگر اطلاعات هاست</h2></div>
-        <p>کشور، آی‌پی و اطلاعات کامل هاست هر سایت را با یک جستجو کشف کنید.</p>
-      </div>
-
-      <div class="host-lookup-wrapper">
-        <div class="lookup-input-section">
-          <div class="input-container">
-            <div class="input-icon">🌐</div>
-            <input 
-              type="text" 
-              id="hostInput" 
-              class="host-input" 
-              placeholder="google.com, github.com, ..." 
-              dir="ltr"
-            />
-            <button class="lookup-button" id="lookupButton" type="button">
-              <span class="button-spinner"></span>
-              <span class="button-text">جستجو</span>
-            </button>
-          </div>
-          <p class="input-hint">آدرس وب‌سایت را بدون http:// وارد کنید</p>
-        </div>
-
-        <div class="lookup-loading" id="lookupLoading" hidden>
-          <div class="loading-spinner">
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-          </div>
-          <p class="loading-text">در حال دریافت اطلاعات...</p>
-        </div>
-
-        <div class="lookup-results" id="lookupResults" hidden>
-          <div class="confetti-container" id="confettiContainer"></div>
-          <div class="result-header">
-            <div class="result-domain" id="resultDomain">example.com</div>
-            <div class="result-status" id="resultStatus">
-              <span class="status-dot"></span>
-              <span id="statusText">فعال</span>
+            <span class="metric-icon">⬆</span>
+            <div class="metric-numbers">
+              <span class="metric-val" id="ulVal">—</span>
+              <span class="metric-unit">Mbps</span>
             </div>
-            <div class="ssl-badge" id="sslBadge" hidden>
-              <span>🔒</span>
-              <span>SSL</span>
-            </div>
-          </div>
-
-          <div class="result-cards">
-            <article class="result-card ip-info-card">
-              <div class="card-header">
-                <span class="card-icon">🌍</span>
-                <h4>موقعیت جغرافیایی</h4>
-              </div>
-              <div class="info-group">
-                <div class="info-item">
-                  <span class="info-label">کشور</span>
-                  <strong id="hostCountry" class="info-value">
-                    <span id="hostFlag" class="country-flag"></span>
-                    <span id="hostCountryName">—</span>
-                  </strong>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">شهر</span>
-                  <strong id="hostCity" class="info-value">—</strong>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">منطقه زمانی</span>
-                  <strong id="hostTimezone" class="info-value">—</strong>
-                </div>
-              </div>
-            </article>
-
-            <article class="result-card network-card">
-              <div class="card-header">
-                <span class="card-icon">🔗</span>
-                <h4>اطلاعات شبکه</h4>
-              </div>
-              <div class="info-group">
-                <div class="info-item">
-                  <span class="info-label">آدرس IP</span>
-                  <strong id="hostIp" class="info-value ip-value clickable" title="کلیک کنید تا کپی شود">
-                    <span class="ip-text">—</span>
-                    <span class="copy-icon">📋</span>
-                  </strong>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">ارائه‌دهنده</span>
-                  <strong id="hostIsp" class="info-value">—</strong>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">سازمان</span>
-                  <strong id="hostOrg" class="info-value">—</strong>
-                </div>
-              </div>
-            </article>
-
-            <article class="result-card details-card">
-              <div class="card-header">
-                <span class="card-icon">📊</span>
-                <h4>جزئیات بیشتر</h4>
-              </div>
-              <div class="info-group">
-                <div class="info-item">
-                  <span class="info-label">نوع IP</span>
-                  <span id="hostIpType" class="info-badge">—</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">کد کشور</span>
-                  <strong id="hostCountryCode" class="info-value">—</strong>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">موقعیت</span>
-                  <strong id="hostLatLng" class="info-value location-value">—</strong>
-                </div>
-              </div>
-            </article>
-          </div>
-
-          <div class="result-footer">
-            <div class="result-stats">
-              <span>⚡</span>
-              <span>زمان پاسخگویی:</span>
-              <strong id="responseTime">--</strong>
-              <span>ms</span>
-            </div>
-            <div class="footer-buttons">
-              <button class="share-button" id="shareButton" type="button">
-                <span>🔗</span>
-                اشتراک‌گذاری
-              </button>
-              <button class="new-search-button" id="newSearchButton" type="button">
-                جستجوی جدید
-              </button>
-            </div>
+            <span class="metric-label">آپلود</span>
           </div>
         </div>
 
-        <div class="lookup-error" id="lookupError" hidden>
-          <div class="error-icon">⚠️</div>
-          <h3>خطا در دریافت اطلاعات</h3>
-          <p id="errorMessage">لطفاً آدرس وارد شده را بررسی کنید و دوباره تلاش کنید.</p>
-          <button class="retry-button" id="retryButton" type="button">تلاش مجدد</button>
+        <div class="action-buttons">
+          <button class="start-btn" id="startBtn" type="button">
+            <span class="btn-icon">▶</span>
+            شروع تست
+          </button>
+          <button class="stop-btn" id="stopBtn" type="button" hidden>
+            <span class="btn-icon">■</span>
+            توقف
+          </button>
         </div>
       </div>
-    </section>
 
-    <section class="contact-section" id="contact">
-      <div class="container contact-box">
-        <div class="contact-developer">
-          <span class="section-index">DEVELOPER / توسعه‌دهنده و برنامه‌نویس</span>
-          <h2>حامد عبدالهی <em>(ویگا)</em></h2>
-          <strong>Hamed Abdollahi (Wiga)</strong>
+      <div class="dashboard">
+        <div class="gauge-wrap">
+          <canvas id="gaugeCanvas" width="320" height="220" aria-label="نمایشگر سرعت"></canvas>
+          <div class="gauge-overlay">
+            <span class="gauge-speed" id="gaugeVal">0</span>
+            <span class="gauge-unit-label">Mbps</span>
+          </div>
         </div>
-        <div class="contact-actions">
-          <a class="contact-button sms-button" href="sms:09387160092?body=%D8%B3%D9%84%D8%A7%D9%85%20%D8%AD%D8%A7%D9%85%D8%AF%D8%8C%20%D8%A7%D8%B2%20%D8%B3%D8%A7%DB%8C%D8%AA%20WigaNet%20%D9%BE%DB%8C%D8%A7%D9%85%20%D9%85%DB%8C%E2%80%8C%D8%AF%D9%87%D9%85.">
-            <span class="contact-icon">SMS</span>
-            <span><small>تماس با ما از طریق پیامک</small><b dir="ltr">0938 716 0092</b></span>
-          </a>
-          <a class="contact-button telegram-button" href="https://t.me/hwwigas" target="_blank" rel="noopener noreferrer">
-            <span class="contact-icon">TG</span>
-            <span><small>پیام در تلگرام</small><b dir="ltr">@hwwigas</b></span>
-          </a>
-        </div>
+        <p class="test-status" id="testStatus">آماده برای تست</p>
       </div>
-    </section>
-  </main>
 
-  <footer>
+    </div>
+  </section>
+
+  <!-- ═══ STATS STRIP / DETAILS ═══ -->
+  <section class="stats-strip" id="details">
+    <div class="container stats-inner">
+      <div class="stat-item">
+        <span class="stat-icon">〰</span>
+        <div class="stat-nums">
+          <span class="stat-val" id="jitterVal">—</span>
+          <span class="stat-unit">ms</span>
+        </div>
+        <span class="stat-label">جیتر</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">📶</span>
+        <div class="stat-nums">
+          <span class="stat-val" id="networkType">—</span>
+        </div>
+        <span class="stat-label">شبکه</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">📊</span>
+        <div class="stat-nums">
+          <span class="stat-val" id="dataUsed">0</span>
+          <span class="stat-unit">MB</span>
+        </div>
+        <span class="stat-label">داده مصرفی</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">🖥</span>
+        <div class="stat-nums">
+          <span class="stat-val" id="serverName">Cloudflare</span>
+        </div>
+        <span class="stat-label">سرور</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PRIVACY SECTION ═══ -->
+  <section class="privacy-section" id="privacy">
     <div class="container">
-      <a class="brand footer-brand" href="#">
-        <img class="brand-logo" src="logo.png" alt="لوگوی WigaNet" width="42" height="42">
-        <span><strong>WIGA</strong>NET</span>
+      <div class="section-heading">
+        <div>
+          <span class="section-index">02 / PRIVACY</span>
+          <h2>حریم خصوصی و امنیت</h2>
+        </div>
+        <p>اطلاعات IP، DNS و WebRTC اتصال خود را بررسی و ارزیابی کنید.</p>
+      </div>
+
+      <div class="security-cards">
+
+        <!-- IP Card -->
+        <div class="security-card" id="ipCard">
+          <div class="card-top">
+            <span class="card-big-icon">🌐</span>
+            <div>
+              <h3>آدرس IP شما</h3>
+              <span class="status-badge checking" id="ipBadge">در حال بررسی...</span>
+            </div>
+          </div>
+          <address class="ip-address" id="ipAddress" dir="ltr">—.—.—.—</address>
+          <dl class="card-dl">
+            <dt>موقعیت</dt><dd id="ipLocation">—</dd>
+            <dt>ارائه‌دهنده</dt><dd id="ipIsp">—</dd>
+            <dt>نوع IP</dt><dd id="ipType">—</dd>
+          </dl>
+          <button class="card-button" type="button" id="refreshIpBtn">بروزرسانی</button>
+        </div>
+
+        <!-- DNS Card -->
+        <div class="security-card" id="dnsCard">
+          <div class="card-top">
+            <span class="card-big-icon">🔍</span>
+            <div>
+              <h3>سرور DNS</h3>
+              <span class="status-badge checking" id="dnsBadge">در حال بررسی...</span>
+            </div>
+          </div>
+          <div class="result-console" id="dnsConsole">در حال بررسی سرورهای DNS...</div>
+          <dl class="card-dl">
+            <dt>ارائه‌دهنده</dt><dd id="dnsProvider">—</dd>
+            <dt>وضعیت</dt><dd id="dnsStatus">—</dd>
+          </dl>
+          <button class="card-button" type="button" id="refreshDnsBtn">بروزرسانی</button>
+        </div>
+
+        <!-- WebRTC Card -->
+        <div class="security-card" id="webrtcCard">
+          <div class="card-top">
+            <span class="card-big-icon">📡</span>
+            <div>
+              <h3>نشت WebRTC</h3>
+              <span class="status-badge checking" id="webrtcBadge">در حال بررسی...</span>
+            </div>
+          </div>
+          <div class="result-console" id="webrtcConsole">در حال بررسی نشت WebRTC...</div>
+          <dl class="card-dl">
+            <dt>IP عمومی</dt><dd id="webrtcPublicIp">—</dd>
+            <dt>IP محلی</dt><dd id="webrtcLocalIp">—</dd>
+          </dl>
+          <button class="card-button" type="button" id="refreshWebrtcBtn">بروزرسانی</button>
+        </div>
+
+      </div>
+
+      <div class="privacy-notice">
+        <span>🔒</span>
+        <p>تمام بررسی‌ها مستقیماً در مرورگر شما انجام می‌شود. هیچ اطلاعاتی در سرور ذخیره نمی‌شود.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ HOST LOOKUP ═══ -->
+  <section class="host-lookup-section container" id="host-lookup">
+    <div class="section-heading">
+      <div><span class="section-index">03 / HOST FINDER</span><h2>جستجوگر اطلاعات هاست</h2></div>
+      <p>کشور، آی‌پی و اطلاعات کامل هاست هر سایت را با یک جستجو کشف کنید.</p>
+    </div>
+    <div class="host-lookup-wrapper">
+      <div class="lookup-input-section">
+        <div class="input-container" id="inputContainer">
+          <input type="text" id="hostInput" class="host-input" placeholder="google.com, github.com, ..." dir="ltr" autocomplete="off" />
+          <button class="lookup-button" id="lookupButton" type="button">
+            <span class="button-spinner"></span>
+            <span class="button-text">جستجو</span>
+          </button>
+        </div>
+        <p class="input-hint">آدرس وب‌سایت را بدون http:// وارد کنید</p>
+      </div>
+
+      <div class="lookup-loading" id="lookupLoading" hidden>
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+        </div>
+        <p class="loading-text">در حال دریافت اطلاعات...</p>
+      </div>
+
+      <div class="lookup-results" id="lookupResults" hidden>
+        <div class="confetti-container" id="confettiContainer"></div>
+        <div class="result-header">
+          <div class="result-domain" id="resultDomain">example.com</div>
+          <div class="result-status">
+            <span class="status-dot"></span>
+            <span>فعال</span>
+          </div>
+          <div class="ssl-badge" id="sslBadge" hidden>
+            <span>🔒</span>
+            <span>SSL</span>
+          </div>
+        </div>
+        <div class="result-cards">
+          <article class="result-card">
+            <div class="card-header">
+              <span class="card-icon">🌍</span>
+              <h4>موقعیت جغرافیایی</h4>
+            </div>
+            <div class="info-group">
+              <div class="info-item"><span class="info-label">کشور</span><strong class="info-value"><span id="hostFlag"></span><span id="hostCountryName">—</span></strong></div>
+              <div class="info-item"><span class="info-label">شهر</span><strong id="hostCity" class="info-value">—</strong></div>
+              <div class="info-item"><span class="info-label">منطقه زمانی</span><strong id="hostTimezone" class="info-value">—</strong></div>
+            </div>
+          </article>
+          <article class="result-card">
+            <div class="card-header">
+              <span class="card-icon">🔗</span>
+              <h4>اطلاعات شبکه</h4>
+            </div>
+            <div class="info-group">
+              <div class="info-item"><span class="info-label">آدرس IP</span><strong id="hostIp" class="info-value ip-value clickable" title="کلیک برای کپی"><span class="ip-text">—</span><span class="copy-icon">📋</span></strong></div>
+              <div class="info-item"><span class="info-label">ارائه‌دهنده</span><strong id="hostIsp" class="info-value">—</strong></div>
+              <div class="info-item"><span class="info-label">سازمان</span><strong id="hostOrg" class="info-value">—</strong></div>
+            </div>
+          </article>
+          <article class="result-card">
+            <div class="card-header">
+              <span class="card-icon">📊</span>
+              <h4>جزئیات بیشتر</h4>
+            </div>
+            <div class="info-group">
+              <div class="info-item"><span class="info-label">نوع IP</span><span id="hostIpType" class="info-badge">—</span></div>
+              <div class="info-item"><span class="info-label">کد کشور</span><strong id="hostCountryCode" class="info-value">—</strong></div>
+              <div class="info-item"><span class="info-label">موقعیت</span><strong id="hostLatLng" class="info-value location-value">—</strong></div>
+            </div>
+          </article>
+        </div>
+        <div class="result-footer">
+          <div class="result-stats">
+            <span>⚡</span>
+            <span>زمان پاسخگویی:</span>
+            <strong id="responseTime">--</strong>
+            <span>ms</span>
+          </div>
+          <div class="footer-buttons">
+            <button class="share-button" id="shareButton" type="button"><span>🔗</span>اشتراک‌گذاری</button>
+            <button class="new-search-button" id="newSearchButton" type="button">جستجوی جدید</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lookup-error" id="lookupError" hidden>
+        <div class="error-icon">⚠️</div>
+        <h3>خطا در دریافت اطلاعات</h3>
+        <p id="errorMessage">لطفاً آدرس وارد شده را بررسی کنید و دوباره تلاش کنید.</p>
+        <button class="retry-button" id="retryButton" type="button">تلاش مجدد</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CONTACT ═══ -->
+  <section class="contact-section" id="contact">
+    <div class="container contact-box">
+      <div class="contact-developer">
+        <span class="section-index">DEVELOPER / توسعه‌دهنده و برنامه‌نویس</span>
+        <h2>حامد عبدالهی <em>(ویگا)</em></h2>
+        <strong>Hamed Abdollahi (Wiga)</strong>
+      </div>
+      <div class="contact-actions">
+        <a class="contact-button sms-button" href="sms:09387160092?body=سلام حامد، از سایت WigaNet پیام می‌دهم.">
+          <span class="contact-icon">SMS</span>
+          <span><small>تماس از طریق پیامک</small><b dir="ltr">0938 716 0092</b></span>
+        </a>
+        <a class="contact-button telegram-button" href="https://t.me/hwwigas" target="_blank" rel="noopener noreferrer">
+          <span class="contact-icon">TG</span>
+          <span><small>پیام در تلگرام</small><b dir="ltr">@hwwigas</b></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <a class="footer-brand" href="#">
+        <img src="logo.png" alt="WigaNet" width="28" height="28" onerror="this.style.display='none'" />
+        <span>WigaNet</span>
       </a>
-      <p>طراحی و برنامه‌نویسی: حامد عبدالهی (ویگا) — Hamed Abdollahi (Wiga)</p>
-      <span>WigaNet © 2026</span>
+      <p class="footer-copy">© ۱۴۰۵ — ساخته شده با ❤️ توسط <strong>حامد عبدالهی (ویگا)</strong></p>
+      <p class="footer-rights">تمامی حقوق محفوظ است.</p>
     </div>
   </footer>
 
