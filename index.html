@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
 
@@ -37,6 +37,9 @@
 
   <!-- ═══ HERO / SPEED TEST ═══ -->
   <section class="hero" id="speed">
+    <div class="ambient-dots hero-dots" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
     <div class="container hero-inner">
 
       <div class="hero-copy">
@@ -115,7 +118,7 @@
         <div class="stat-nums">
           <span class="stat-val" id="networkType">—</span>
         </div>
-        <span class="stat-label">شبکه</span>
+        <span class="stat-label">کیفیت شبکه</span>
       </div>
       <div class="stat-item">
         <span class="stat-icon">📊</span>
@@ -211,6 +214,9 @@
 
   <!-- ═══ HOST LOOKUP ═══ -->
   <section class="host-lookup-section container" id="host-lookup">
+    <div class="ambient-dots" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
     <div class="section-heading">
       <div><span class="section-index">03 / HOST FINDER</span><h2>جستجوگر اطلاعات هاست</h2></div>
       <p>کشور، آی‌پی و اطلاعات کامل هاست هر سایت را با یک جستجو کشف کنید.</p>
@@ -224,7 +230,7 @@
             <span class="button-text">جستجو</span>
           </button>
         </div>
-        <p class="input-hint">آدرس وب‌سایت را بدون http:// وارد کنید</p>
+        <p class="input-hint" id="hostInputHint">آدرس وب‌سایت را وارد کنید؛ مانند google.com</p>
       </div>
 
       <div class="lookup-loading" id="lookupLoading" hidden>
@@ -340,6 +346,6 @@
     </div>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
