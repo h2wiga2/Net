@@ -101,8 +101,10 @@ async function testDownload() {
   const sizes = [1_000_000, 4_000_000, 10_000_000];
   const speeds = [];
   for (const bytes of sizes) {
-    const { response, elapsed } = await timedFetch(`https://speed.cloudflare.com/__down?bytes=${bytes}&t=${Date.now()}`);
+    const started = performance.now();
+    const { response } = await timedFetch(`https://speed.cloudflare.com/__down?bytes=${bytes}&t=${Date.now()}`);
     const blob = await response.blob();
+    const elapsed = performance.now() - started;
     state.dataBytes += blob.size;
     const mbps = (blob.size * 8) / (elapsed / 1000) / 1_000_000;
     speeds.push(mbps); state.target = mbps;
@@ -112,6 +114,7 @@ async function testDownload() {
   const result = speeds.slice(-2).reduce((sum, n) => sum + n, 0) / Math.min(2, speeds.length);
   if (els.dlVal) els.dlVal.textContent = result.toFixed(1);
   state.target = result;
+  updateNetworkInfo(result);
 }
 
 async function testUpload() {
@@ -342,7 +345,7 @@ function showConfetti() {
   if (!container) return;
   container.innerHTML = "";
   const colors = ["var(--orange)", "var(--green)", "#41a9e6", "#ffba45", "var(--orange-soft)"];
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 8; i++) {
     const piece = document.createElement("div");
     piece.className = "confetti";
     piece.style.left = `${Math.random() * 100}%`;
@@ -374,6 +377,37 @@ async function checkSslBadge(domain) {
   }
 }
 
+async function resolveDomainToIp(domain) {
+  const providers = [
+    {
+      url: `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=A`,
+      options: { headers: { Accept: "application/dns-json" } },
+    },
+    {
+      url: `https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=A`,
+      options: {},
+    },
+  ];
+
+  for (const provider of providers) {
+    try {
+      const response = await fetch(provider.url, {
+        ...provider.options,
+        cache: "no-store",
+        signal: AbortSignal.timeout(6000),
+      });
+      if (!response.ok) continue;
+      const data = await response.json();
+      const record = data.Answer?.find((answer) => answer.type === 1 && /^\d{1,3}(\.\d{1,3}){3}$/.test(answer.data));
+      if (record?.data) return record.data;
+    } catch {
+      // Try the next DNS-over-HTTPS provider.
+    }
+  }
+
+  throw new Error("دامنه پیدا نشد یا سرویس DNS در دسترس نیست");
+}
+
 async function lookupHost() {
   const raw = els.hostInput.value;
   if (!raw || !raw.trim()) return; // nothing typed yet — do not show an error
@@ -391,7 +425,8 @@ async function lookupHost() {
   const startTime = performance.now();
 
   try {
-    const response = await fetch(`https://ipwho.is/${encodeURIComponent(domain)}`, {
+    const resolvedIp = await resolveDomainToIp(domain);
+    const response = await fetch(`https://ipwho.is/${encodeURIComponent(resolvedIp)}`, {
       cache: "no-store",
       signal: AbortSignal.timeout(10000),
     });
@@ -443,7 +478,7 @@ async function lookupHost() {
       domain,
       country: data.country,
       city: data.city,
-      ip: data.ip,
+      ip: data.ip || resolvedIp,
       isp: data.connection?.isp,
     };
 
@@ -498,6 +533,7 @@ if (els.hostInput) {
     if (els.inputContainer) {
       els.inputContainer.style.borderColor = this.value ? "rgba(255,90,31,.5)" : "";
     }
+    if (els.lookupError && !els.lookupError.hidden) setLookupState("idle");
   });
 }
 
@@ -577,18 +613,47 @@ document.querySelectorAll('nav a[href^="#"]').forEach((anchor) => {
   });
 });
 
-/* Network Information API (optional, best-effort) */
+/* Network Information API is only an estimate and usually does not reveal Wi-Fi vs mobile. */
 const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-if (connection && els.networkType) {
-  const labels = { "slow-2g": "بسیار ضعیف", "2g": "2G", "3g": "3G", "4g": "4G / سریع" };
-  els.networkType.textContent = labels[connection.effectiveType] || connection.effectiveType || "نامشخص";
+
+function updateNetworkInfo(measuredMbps = null) {
+  if (!els.networkType) return;
+
+  const typeLabels = {
+    wifi: "Wi-Fi",
+    cellular: "دیتای موبایل",
+    ethernet: "کابل شبکه",
+    bluetooth: "Bluetooth",
+    wimax: "WiMAX",
+    none: "بدون اتصال",
+    unknown: "نامشخص",
+  };
+
+  if (connection?.type && typeLabels[connection.type]) {
+    els.networkType.textContent = typeLabels[connection.type];
+  } else if (Number.isFinite(measuredMbps)) {
+    els.networkType.textContent = measuredMbps >= 50 ? "بسیار سریع" : measuredMbps >= 15 ? "سریع" : measuredMbps >= 5 ? "متوسط" : "ضعیف";
+  } else if (Number.isFinite(connection?.downlink)) {
+    els.networkType.textContent = `حدود ${connection.downlink} Mbps`;
+  } else {
+    els.networkType.textContent = "پس از تست مشخص می‌شود";
+  }
+
+  const details = [];
+  if (connection?.effectiveType) details.push(`رده تخمینی مرورگر: ${connection.effectiveType}`);
+  if (Number.isFinite(connection?.rtt)) details.push(`RTT تخمینی: ${connection.rtt} ms`);
+  if (Number.isFinite(connection?.downlink)) details.push(`Downlink تخمینی: ${connection.downlink} Mbps`);
+  els.networkType.title = details.join(" | ");
 }
+
+if (connection?.addEventListener) connection.addEventListener("change", () => updateNetworkInfo());
 
 /* ════════════════════════════════════════
    INIT
    ════════════════════════════════════════ */
 
 updateConnection();
+updateNetworkInfo();
 drawGauge(0);
 animateGauge();
 setLookupState("idle");
