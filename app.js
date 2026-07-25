@@ -28,41 +28,124 @@ const ctx = canvas ? canvas.getContext("2d") : null;
 
 function drawGauge(value = 0) {
   if (!ctx) return;
-  const w = canvas.width, h = canvas.height;
-  const cx = w / 2, cy = h * 0.85, radius = Math.min(w * 0.42, h * 0.75);
-  const start = Math.PI * 0.78, end = Math.PI * 2.22;
+
+  const w = canvas.width;
+  const h = canvas.height;
+  const cx = w / 2;
+  const cy = h * .84;
+  const radius = Math.min(w * .41, h * .73);
+  const start = Math.PI * .78;
+  const end = Math.PI * 2.22;
+  const safeValue = Math.max(0, Math.min(value, 500));
+  const progress = safeValue / 500;
+
   ctx.clearRect(0, 0, w, h);
+  ctx.lineCap = "round";
 
-  ctx.beginPath(); ctx.arc(cx, cy, radius + 16, start, end);
-  ctx.strokeStyle = "rgba(255,255,255,.06)"; ctx.lineWidth = 2; ctx.stroke();
+  const halo = ctx.createRadialGradient(cx, cy, radius * .15, cx, cy, radius * 1.18);
+  halo.addColorStop(0, "rgba(255,90,31,.075)");
+  halo.addColorStop(.58, "rgba(255,90,31,.018)");
+  halo.addColorStop(1, "rgba(255,90,31,0)");
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, w, h);
 
-  const ticks = 40;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius + 19, start, end);
+  ctx.strokeStyle = "rgba(255,255,255,.045)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius + 10, start, end);
+  ctx.strokeStyle = "rgba(255,255,255,.075)";
+  ctx.lineWidth = 5;
+  ctx.stroke();
+
+  if (progress > 0) {
+    const arcGradient = ctx.createLinearGradient(cx - radius, cy, cx + radius, cy);
+    arcGradient.addColorStop(0, "#ff5a1f");
+    arcGradient.addColorStop(.72, "#ff7134");
+    arcGradient.addColorStop(1, "#ffb13b");
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius + 10, start, start + (end - start) * progress);
+    ctx.strokeStyle = arcGradient;
+    ctx.lineWidth = 5;
+    ctx.shadowColor = "rgba(255,90,31,.8)";
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  const ticks = 48;
   for (let i = 0; i <= ticks; i++) {
-    const angle = start + (end - start) * (i / ticks);
-    const major = i % 5 === 0;
-    const active = i / ticks <= Math.min(value / 500, 1);
-    const inner = radius - (major ? 16 : 8), outer = radius;
+    const ratio = i / ticks;
+    const angle = start + (end - start) * ratio;
+    const major = i % 8 === 0;
+    const active = ratio <= progress;
+    const inner = radius - (major ? 18 : 9);
+    const outer = radius;
+
     ctx.beginPath();
     ctx.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
     ctx.lineTo(cx + Math.cos(angle) * outer, cy + Math.sin(angle) * outer);
-    ctx.strokeStyle = active ? "#ff5a1f" : (major ? "rgba(255,255,255,.35)" : "rgba(255,255,255,.12)");
-    ctx.lineWidth = major ? 2.5 : 1.2;
-    ctx.shadowColor = active ? "#ff5a1f" : "transparent"; ctx.shadowBlur = active ? 6 : 0;
+    ctx.strokeStyle = active
+      ? (ratio > .8 ? "#ffb13b" : "#ff5a1f")
+      : (major ? "rgba(255,255,255,.42)" : "rgba(255,255,255,.13)");
+    ctx.lineWidth = major ? 2.6 : 1.1;
+    ctx.shadowColor = active ? "#ff5a1f" : "transparent";
+    ctx.shadowBlur = active ? 6 : 0;
     ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    if (major) {
+      const labelRadius = radius - 34;
+      const label = Math.round(500 * ratio);
+      ctx.fillStyle = active ? "rgba(255,255,255,.8)" : "rgba(255,255,255,.32)";
+      ctx.font = "600 9px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, cx + Math.cos(angle) * labelRadius, cy + Math.sin(angle) * labelRadius);
+    }
   }
 
-  const safeValue = Math.min(value, 500);
-  const needleAngle = start + (end - start) * (safeValue / 500);
-  ctx.save(); ctx.translate(cx, cy); ctx.rotate(needleAngle);
-  const grad = ctx.createLinearGradient(-14, 0, radius - 30, 0);
-  grad.addColorStop(0, "#8b3018"); grad.addColorStop(1, "#ff6b2b");
+  const needleAngle = start + (end - start) * progress;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(needleAngle);
+  const needleGradient = ctx.createLinearGradient(-14, 0, radius - 28, 0);
+  needleGradient.addColorStop(0, "#711f12");
+  needleGradient.addColorStop(.65, "#ff5a1f");
+  needleGradient.addColorStop(1, "#ffc09d");
   ctx.beginPath();
-  ctx.moveTo(-12, 2); ctx.lineTo(radius - 28, 1); ctx.lineTo(radius - 20, 0); ctx.lineTo(radius - 28, -1); ctx.lineTo(-12, -2);
-  ctx.closePath(); ctx.fillStyle = grad; ctx.shadowColor = "#ff5a1f"; ctx.shadowBlur = 8; ctx.fill();
-  ctx.restore(); ctx.shadowBlur = 0;
+  ctx.moveTo(-14, 3.2);
+  ctx.lineTo(radius - 30, 1.8);
+  ctx.lineTo(radius - 18, 0);
+  ctx.lineTo(radius - 30, -1.8);
+  ctx.lineTo(-14, -3.2);
+  ctx.closePath();
+  ctx.fillStyle = needleGradient;
+  ctx.shadowColor = "#ff5a1f";
+  ctx.shadowBlur = 12;
+  ctx.fill();
+  ctx.restore();
+  ctx.shadowBlur = 0;
 
-  ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fillStyle = "#080a0e"; ctx.fill();
-  ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fillStyle = "#ff5a1f"; ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 13, 0, Math.PI * 2);
+  ctx.fillStyle = "#090c10";
+  ctx.strokeStyle = "rgba(255,255,255,.16)";
+  ctx.lineWidth = 2;
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+  ctx.fillStyle = "#ff5a1f";
+  ctx.shadowColor = "#ff5a1f";
+  ctx.shadowBlur = 10;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.lineCap = "butt";
 }
 
 function animateGauge() {
